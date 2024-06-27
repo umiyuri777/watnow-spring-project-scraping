@@ -108,17 +108,14 @@ for page_num in range(1, page_limit):
         if izakaya_review_text == None:
             izakaya_review_text = "None"
         else:
-            izakaya_review_text = izakaya_review_text.text.replace(",", " ").replace("\n", " ").replace("\r", " ")
+            izakaya_review_text = izakaya_review_text.text.replace(",", " ").replace("\n", " ").replace("\r", " ").replace(" ", "").replace("\n", "").replace("　", " ")
 
         # 居酒屋の住所を取得
         izakaya_address_url = f"https://www.hotpepper.jp{izakaya_detail_page_url}"
         response = requests.get(izakaya_address_url)
         response.encoding = response.apparent_encoding
         soup = BeautifulSoup(response.text, 'html.parser')
-        izakaya_address = soup.find(class_= "shopInfoDetail").find('address').text.strip().replace("〒", "").replace(" ", "").replace("\n", "").replace("\r", "")
-
-        # 営業時間を取得
-        izakaya_opening_hours = soup.find(class_= "shophour").text.strip().replace(" ", "").replace("\n", "").replace("\r", "")
+        izakaya_address = soup.find(class_= "shopInfoDetail").find('address').text.strip().replace("〒", "").replace(" ", "").replace("\n", "").replace("\r", "").replace(",", " ").replace("　", " ")
 
         # 居酒屋の緯度経度を取得
         izakaya_coordinate = get_location(izakaya_address)
