@@ -44,7 +44,7 @@ id = 1
 
 # ファイルを開く
 f = open('example.csv', 'w', encoding='utf-8')
-f.write('id,name,lng,lat,area,category,prompt,photo_url\n')
+f.write('id,name,lat,lng,category,prompt,photo_url,address,izakaya_url\n')
 
 # ページ数を取得
 ibaraki_izakaya_url = f"https://www.hotpepper.jp/SA23/Y356/G001_G012/net1/bgn1/"
@@ -106,7 +106,7 @@ for page_num in range(1, page_limit):
         izakaya_review_text = izakaya_review_content_soup.find(class_="text")
 
         if izakaya_review_text == None:
-            izakaya_review_text = "レビューがありません"
+            izakaya_review_text = "None"
         else:
             izakaya_review_text = izakaya_review_text.text.replace(",", " ").replace("\n", " ").replace("\r", " ")
 
@@ -117,13 +117,16 @@ for page_num in range(1, page_limit):
         soup = BeautifulSoup(response.text, 'html.parser')
         izakaya_address = soup.find(class_= "shopInfoDetail").find('address').text.strip().replace("〒", "").replace(" ", "").replace("\n", "").replace("\r", "")
 
+        # 営業時間を取得
+        izakaya_opening_hours = soup.find(class_= "shophour").text.strip().replace(" ", "").replace("\n", "").replace("\r", "")
+
         # 居酒屋の緯度経度を取得
         izakaya_coordinate = get_location(izakaya_address)
 
         image_url = izakaya_info.find('img').get('src')
         izakaya_tag = izakaya_info.find("p", class_='storeNamePrefix fcGray')
         if izakaya_tag == None:
-            izakaya_tag = "タグがありません"
+            izakaya_tag = "None"
         else:
             izakaya_tag = izakaya_tag.text.replace("　", " ").replace("/", " ").replace(" ", " ").replace(",", " ")
 
@@ -135,13 +138,15 @@ for page_num in range(1, page_limit):
         f.write(',')
         f.write(str(izakaya_coordinate.coordinate[1]))
         f.write(',')
-        f.write(izakaya_area)
-        f.write(',')
         f.write(izakaya_tag)
         f.write(',')
         f.write(izakaya_review_text)
         f.write(',')
         f.write(image_url)
+        f.write(',')
+        f.write(izakaya_address)
+        f.write(',')
+        f.write(izakaya_address_url)
         f.write('\n')
         id += 1
     
